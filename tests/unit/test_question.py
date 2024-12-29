@@ -1,5 +1,4 @@
-import pytest
-from easy_eval.question import Question, QuestionConfig
+from easy_inspect.question import QuestionConfig
 
 def test_question_config_hashable():
     # Create two identical configs

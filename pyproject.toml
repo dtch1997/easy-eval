@@ -1,7 +1,7 @@
 [project]
-name = "easy-eval"
+name = "easy-inspect"
 version = "0.1.0"
-description = "High-level, zero-code interface for evaluating LLMs"
+description = "High-level, zero-code interface for evaluating LLMs using Inspect-AI"
 authors = [
     {name = "Daniel Tan", email = "dtch1997@users.noreply.github.com"},
 ]

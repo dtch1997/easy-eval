@@ -1,7 +1,7 @@
 from pathlib import Path
-from easy_eval import Runner
-from easy_eval.loading import load_question_from_yaml_dir
-from easy_eval.plotting import models_plot
+from easy_inspect import Runner
+from easy_inspect.loading import load_question_from_yaml_dir
+from easy_inspect.plotting import models_plot
 from dotenv import load_dotenv
 
 curr_dir = Path(__file__).parent

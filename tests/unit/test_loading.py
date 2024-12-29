@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
-from easy_eval.loading import load_question_from_yaml, load_question_from_yaml_dir
-from easy_eval.question import Question
+from easy_inspect.loading import load_question_from_yaml, load_question_from_yaml_dir
+from easy_inspect.question import Question
 
 @pytest.fixture
 def sample_yaml_file(tmp_path):

@@ -4,7 +4,7 @@ import pandas as pd
 from pathlib import Path
 from inspect_ai import eval
 from inspect_ai.log import EvalLog, write_eval_log, read_eval_log
-from easy_eval.question import Question
+from easy_inspect.question import Question
 
 def get_filename(question_hash: str | int, model_hash: str | int) -> Path:
     return hashlib.sha256(f"{question_hash}_{model_hash}".encode()).hexdigest()
