@@ -41,3 +41,8 @@ class Benchmark:
                 questions.extend([Question(**q) for q in raw_config])
                 
         return cls(questions)
+    
+    def run(self, model: str | list[str]) -> None:
+        """Run the benchmark on a given model."""
+        tasks = [q.build_task() for q in self.questions]
+        eval(tasks = tasks, model = model)

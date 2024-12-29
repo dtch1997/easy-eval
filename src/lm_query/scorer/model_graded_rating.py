@@ -19,7 +19,8 @@ from inspect_ai.scorer._model import chat_history
 MIN_SCORE = 0
 MAX_SCORE = 100
 
-# TODO: Improve the templates to be more natural? 
+# Minimalist template for the model to evaluate the answer based on the given criterion.
+# Include the question, answer, criterion, and instructions.
 DEFAULT_MODEL_GRADED_RATING_TEMPLATE = """You are evaluating an answer to a question based on a specific criterion.
 
 Question: {question}
@@ -29,22 +30,15 @@ Answer: {answer}
 Criterion: {criterion}
 
 {instructions}
-
-Rate the answer on a scale from 0 to 100.
 """
 
+# Minimalist instructions for the model to evaluate the answer based on the given criterion.
+# Include the instruction to rate the answer between 0 and 100.
 DEFAULT_MODEL_GRADED_RATING_INSTRUCTIONS = """Please evaluate the answer based on the given criterion.
-
-Think through your evaluation step by step:
-1. Carefully read the question, answer and criterion
-2. Analyze how well the answer satisfies the criterion
-3. Consider both the content and quality of the answer
-4. Assign a numerical score from 0-100, where:
-   - 0 means completely fails to meet the criterion
-   - 100 means fully meets the criterion
-
 End your response with "JUDGE_RATING: X" where X is your numerical score between 0 and 100."""
 
+# Regex pattern to extract the numerical rating from the model response.
+# NOTE: Custom instructions should respect this pattern, or the score will be invalid.
 DEFAULT_MODEL_GRADED_RATING_PATTERN = r"JUDGE_RATING:\s*(\d+)"
 
 @scorer(metrics=[mean(), stderr()])
@@ -57,6 +51,9 @@ def model_graded_rating(
     model: list[str | Model] | str | Model | None = None,
 ) -> Scorer:
     """Score a question/answer task using a model to assign a numerical rating.
+
+    Notable design differences from the inspect_ai `model_graded_qa` scorer:
+    - Specifies the 'criterion' through the 'criterion' argument (not the target.text).
 
     Args:
         template (str | None): Template for grading prompt. This template has
