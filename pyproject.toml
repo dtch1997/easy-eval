@@ -10,6 +10,14 @@ requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
 
+[project.optional-dependencies]
+examples = [
+    "ipykernel>=6.29.5",
+    "python-dotenv>=1.0.1",
+    "ipywidgets>=8.1.5",
+    "openai>=1.58.1",
+    "anthropic>=0.42.0",
+]
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
