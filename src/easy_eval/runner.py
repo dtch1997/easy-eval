@@ -53,7 +53,7 @@ class Runner:
         # - Check if the task has been run before by checking the log directory
 
         for log in logs:
-            question_hash = hash(self.question)
+            question_hash = self.question.hash()
             model_hash = log.eval.model
             # New filename is a hash of the question and model
             # TODO: Are there other relevant variables to include in the hash?

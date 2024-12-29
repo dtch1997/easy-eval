@@ -50,7 +50,7 @@ class QuestionConfig:
             if not self.judge_prompts:
                 raise ValueError(f"Question {self.id}: judge_prompts required for {self.type}")
 
-    def hash(self):
+    def hash(self) -> str:
         """This is a unique identifier of a question. Changes when we change the wording.
         
         We use that to determine whether we can use cached results.
@@ -64,7 +64,7 @@ class Question:
         self.config = config
         self.config.validate()
 
-    def __hash__(self) -> int:
+    def hash(self) -> str:
         return self.config.hash()
 
     def build_task(self) -> Task:

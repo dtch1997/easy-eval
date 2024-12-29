@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 sns.set_theme(style="darkgrid")
 
-def models_plot(df: pd.DataFrame, column: str):
+def models_plot(df: pd.DataFrame, metric: str):
     plt.figure(figsize=(10, 6))
-    sns.barplot(x="model", y=column, data=df)
+    sns.barplot(x="model", y=metric, data=df)
     plt.show()

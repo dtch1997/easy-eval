@@ -27,20 +27,19 @@ if __name__ == "__main__":
 
     runner = Runner(log_dir=curr_dir / "logs")
 
-    # # Example 1: Free-form question
-    # question = load_question_from_yaml_dir("example_1", curr_dir)
-    # runner.with_question(question).with_models(models).run()
-    # df = runner.load_results()
-    # print(df)
-
-    # Example 2: Free-form question, judged on 0-100 scale
-    question = load_question_from_yaml_dir("example_2", curr_dir)
+    # Example 1: Free-form question
+    question = load_question_from_yaml_dir("example_1", curr_dir)
     runner.with_question(question).with_models(models).run()
     df = runner.load_results()
     print(df)
 
+    # Example 2: Free-form question, judged on 0-100 scale
+    question = load_question_from_yaml_dir("example_2", curr_dir)
+    # runner.with_question(question).with_models(models).run()
+    df = runner.load_results()
+    print(df)
+
     # Plot the results
-    models_plot(df, "ethical_reasoning/mean")
-    models_plot(df, "ethical_reasoning/stderr")
-    models_plot(df, "harm_consideration/mean")
-    models_plot(df, "harm_consideration/stderr")
+    # TODO: support error bars
+    models_plot(df, metric="ethical_reasoning/mean")
+    models_plot(df, metric="harm_consideration/mean")
