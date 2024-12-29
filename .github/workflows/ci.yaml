@@ -76,7 +76,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish package distributions to PyPI
-        run: pdm publish
+        uses: pypa/gh-action-pypi-publish@release/v1
         if: steps.release.outputs.released == 'true'  
       - name: Publish package distributions to GitHub Releases
         uses: python-semantic-release/upload-to-gh-release@main

@@ -20,5 +20,5 @@ jobs:
       - name: Build
         run: pdm build
         
-      - name: Publish to PyPI
-        run: pdm publish
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
