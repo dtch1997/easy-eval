@@ -3,9 +3,9 @@ import seaborn as sns
 import pandas as pd
 
 from pathlib import Path
-from lm_query import Benchmark
+from lm_query import Benchmark, Runner
 from dotenv import load_dotenv
-from inspect_ai.log import read_eval_log
+from inspect_ai.log import EvalLog
 
 curr_dir = Path(__file__).parent
 
@@ -16,30 +16,25 @@ benchmark = Benchmark.from_yaml_dir(curr_dir)
 # Define models to evaluate
 models = [
     # OpenAI models
-    "openai/gpt-4o-2024-08-06",
+    "openai/gpt-4o-mini-2024-07-18",
+    # "openai/gpt-4o-2024-08-06",
+
     # Anthropic models
-    "anthropic/claude-3-5-sonnet-20241022"
+    "anthropic/claude-3-5-haiku-20241022",
+    # "anthropic/claude-3-5-sonnet-20241022"
 ]
 
-def load_results(results_dir: Path) -> pd.DataFrame:
-    result_files = list(results_dir.glob("*.eval"))
+def parse_results(logs: list[EvalLog]) -> pd.DataFrame:
     rows = []
-
-    for result_file in result_files:
-        print(f"Processing {result_file.name}")
-        log = read_eval_log(str(result_file))
-        if not log.status == "success":
-            print(f"Skipping {result_file.name} because it failed")
-            continue
+    for log in logs:
 
         # Get the task and model
-        question_id = log.eval.task
+        question_id = log.eval.task.split("/")[-1]
         model = log.eval.model
 
         # Get the metrics
         scores = log.results.scores
-        print(scores)
-        # assert len(scores) == 1  # Only one scorer per task
+        assert len(scores) == 1  # Only one scorer per task
         score = scores[0]
         metrics = score.metrics
 
@@ -57,14 +52,17 @@ def load_results(results_dir: Path) -> pd.DataFrame:
     return df
 
 if __name__ == "__main__":
-    benchmark.run(models)
+    print(models)
+    runner = Runner(log_dir=curr_dir / "logs")
+    runner.run(benchmark, models)
+    logs = runner.load_logs()
 
     # Plot the results
-    results_dir = curr_dir / "logs"
-    df = load_results(results_dir)
+    df = parse_results(logs)
     print(df)
 
     # Plot the results
-    sns.set_theme(style="whitegrid")
+    sns.set_theme(style="darkgrid")
+    plt.figure(figsize=(10, 6))
     sns.barplot(x="model", y="mean", data=df)
     plt.show()

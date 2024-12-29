@@ -3,14 +3,23 @@ from typing import List
 
 import yaml
 
+from inspect_ai import Task
 from .question import Question
-from inspect_ai import eval
 
 
 class Benchmark:
+    """A collection of questions to evaluate.
+    
+    This class is responsible for loading and validating the questions
+    """
+
     def __init__(self, questions: List[Question]):
         self.questions = questions
         self._validate()
+
+    def build_tasks(self) -> List[Task]:
+        """Build tasks from the questions."""
+        return [q.build_task() for q in self.questions]
         
     def _validate(self) -> None:
         """Validate the entire configuration."""
@@ -22,6 +31,13 @@ class Benchmark:
         # Validate each question
         for question in self.questions:
             question.validate()
+
+    def get_question_by_id(self, id: str) -> Question:
+        """Get a question by its ID."""
+        for question in self.questions:
+            if question.id == id:
+                return question
+        raise ValueError(f"Question with ID {id} not found")
     
     @classmethod
     def from_yaml(cls, path: Path) -> 'Benchmark':
@@ -42,19 +58,3 @@ class Benchmark:
                 questions.extend([Question(**q) for q in raw_config])
                 
         return cls(questions)
-
-    def run(self, model: str | list[str]) -> None:
-        """Run the benchmark on a given model."""
-        tasks = [q.build_task() for q in self.questions]
-        eval(tasks = tasks, model = model)
-        # Ugh moment: `eval` doesn't check if the task has been run before 
-        # We'd like to check this and skip tasks that have already been run
-        # Ugh moment: `eval` saves to a custom log directory that is kind of inscrutable
-        # We'd like to save to a more user-friendly directory
-
-        # Potential fix to both of the above: 
-        # - Write logs to a custom directory, with hash determined based on the question config
-        # - Check if the task has been run before by checking the log directory
-        # - This should be doable by just calling `write_eval_log` 
-
-        # TODO: Implement this, preferably in a new Runner class that wraps eval

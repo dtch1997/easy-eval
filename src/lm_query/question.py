@@ -1,3 +1,6 @@
+import hashlib
+import json
+
 from dataclasses import dataclass
 from typing import Dict, List, Literal, Optional
 
@@ -42,6 +45,21 @@ class Question:
                 raise ValueError(f"Question {self.id}: judge model required for {self.type}")
             if not self.judge_prompts:
                 raise ValueError(f"Question {self.id}: judge_prompts required for {self.type}")
+
+    def hash(self) -> str:
+        """Hash the question configuration."""
+        # Convert dataclass to dictionary using all attributes
+        config_dict = {
+            'id': self.id,
+            'type': self.type,
+            'paraphrases': self.paraphrases,
+            'samples_per_paraphrase': self.samples_per_paraphrase,
+            'target': self.target,
+            'system_prompt': self.system_prompt,
+            'judge_models': self.judge_models,
+            'judge_prompts': self.judge_prompts
+        }
+        return hashlib.sha256(json.dumps(config_dict, sort_keys=True).encode()).hexdigest()
 
     def build_task(self) -> Task:
         """Build a Task from this Question."""
