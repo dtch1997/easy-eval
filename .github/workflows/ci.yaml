@@ -68,7 +68,7 @@ jobs:
       - uses: pdm-project/setup-pdm@v4
         with:
           cache: true
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
       - name: Semantic Release
         id: release
         uses: python-semantic-release/python-semantic-release@v8.0.7
