@@ -1,45 +1,61 @@
 import hashlib
-from pathlib import Path
+import pandas as pd
 
+from pathlib import Path
 from inspect_ai import eval
 from inspect_ai.log import EvalLog, write_eval_log, read_eval_log
-from easy_eval.benchmark import Benchmark
+from easy_eval.question import Question
 
-def get_filename(question_hash: str, model_hash: str) -> Path:
+def get_filename(question_hash: str | int, model_hash: str | int) -> Path:
     return hashlib.sha256(f"{question_hash}_{model_hash}".encode()).hexdigest()
 
 class Runner:
 
     log_dir: Path
+    question: Question | None = None
+    models: list[str] | None = None
 
     def __init__(self, log_dir: str | Path = "./logs"):
         self.log_dir = Path(log_dir)
-        self.inspect_log_dir = self.log_dir.parent / "_inspect_logs"
+        # Put the base inspect logs in a subdirectory
+        self.inspect_log_dir = self.log_dir / "inspect_logs"
 
-    def run(self, benchmark: Benchmark, models: list[str]):
-        """Run the benchmark on a given set of models."""
-        tasks = benchmark.build_tasks()
+    # Use builder pattern to set the question and models
+
+    def with_question(self, question: Question):
+        self.question = question
+        return self
+
+    def with_models(self, models: list[str]):
+        self.models = models
+        return self
+
+    def run(self):
+        """Run the question on a given set of models."""
+
+        if not self.question:
+            raise ValueError("Question not set")
+        if not self.models:
+            raise ValueError("Models not set")
+
+        task = self.question.build_task()
         # TODO: Filter tasks that have already been run
 
         # Save the inspect logs somewhere else
-        logs: list[EvalLog] = eval(tasks = tasks, model = models, log_dir = str(self.inspect_log_dir))
+        logs: list[EvalLog] = eval(tasks = [task], model = self.models, log_dir = str(self.inspect_log_dir))
 
-        # Ugh moment: `eval` doesn't check if the task has been run before 
-        # We'd like to check this and skip tasks that have already been run
-        # Ugh moment: `eval` saves to a custom log directory that is kind of inscrutable
-        # We'd like to save to a more user-friendly directory
+        # Motivation for the subsequent code:
+        # - inspect_ai's `eval` function doesn't allow caching previous runs. 
+        # - We'd like to be able skip tasks that have already been run.
 
-        # Potential fix to both of the above: 
+        # Implemented fix: 
         # - Write logs to a custom directory, with hash determined based on the question config
         # - Check if the task has been run before by checking the log directory
-        # - This should be doable by just calling `write_eval_log` 
 
-        # TODO: Implement this, preferably in a new Runner class that wraps eval
         for log in logs:
-            question_id = log.eval.task.split("/")[-1]
-            question_hash = benchmark.get_question_by_id(question_id).hash()
+            question_hash = hash(self.question)
             model_hash = log.eval.model
-            # Filename is a hash of the question and model
+            # New filename is a hash of the question and model
             # TODO: Are there other relevant variables to include in the hash?
             log_path = self.log_dir / get_filename(question_hash, model_hash)
             log_path = log_path.with_suffix(".eval")
@@ -49,7 +65,7 @@ class Runner:
             else: 
                 print(f"Skipping {log_path} because it failed")
 
-    def load_logs(self):
+    def load_logs(self) -> list[EvalLog]:
         """Load the results from the log directory."""
         logs = []
         for log_path in self.log_dir.glob("*.eval"):
@@ -57,3 +73,48 @@ class Runner:
             if log.status == "success":
                 logs.append(log)
         return logs
+
+    def parse_results(self, logs: list[EvalLog]) -> pd.DataFrame:
+        """Parse the results from the logs into a DataFrame."""
+        # NOTE: Parsing logic handles some quirks of the `run` method 
+        # Hence why they are bundled together in the `Runner` class
+        rows = []
+        for log in logs:
+
+            # Get the task and model
+            question_id = log.eval.task.split("/")[-1]
+            model = log.eval.model
+
+            row = {
+                "question_id": question_id,
+                "model": model,
+                # TODO: support groupings of models
+            }
+
+            # Get the metrics
+            scores = log.results.scores
+            for score in scores:
+                # get the scorer name
+                if "name" in score.params:
+                    # If name was set at runtime, use that instead
+                    name = score.params["name"]
+                else:
+                    # Else, default to the scorer name
+                    name = score.name
+
+                metrics = score.metrics
+                for metric_name, metric in metrics.items():
+                    row[f"{name}/{metric_name}"] = metric.value
+
+            rows.append(row)
+
+        df = pd.DataFrame(rows)
+        return df
+    
+    def load_results(self) -> pd.DataFrame:
+        """Load the results from the log directory.
+        
+        Syntactic sugar for `load_logs` and `parse_results`.
+        """
+        logs = self.load_logs()
+        return self.parse_results(logs)

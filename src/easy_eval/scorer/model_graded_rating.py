@@ -41,8 +41,10 @@ End your response with "JUDGE_RATING: X" where X is your numerical score between
 # NOTE: Custom instructions should respect this pattern, or the score will be invalid.
 DEFAULT_MODEL_GRADED_RATING_PATTERN = r"JUDGE_RATING:\s*(\d+)"
 
+# TODO: Change 'criterion' to 'judge_prompt'
 @scorer(metrics=[mean(), stderr()])
 def model_graded_rating(
+    name: str, # NOTE: The name is not used here, but will be logged in the EvalResults, enabling us to distinguish between multiple scorers
     criterion: str,
     template: str | None = None,
     instructions: str | None = None,
@@ -56,6 +58,8 @@ def model_graded_rating(
     - Specifies the 'criterion' through the 'criterion' argument (not the target.text).
 
     Args:
+        name (str): Name of the scorer.
+        criterion (str): The judge prompt to use for scoring.
         template (str | None): Template for grading prompt. This template has
             four variables: `question`, `answer`, `criterion`, and `instructions`.
             Variables from sample `metadata` are also available in the template.
