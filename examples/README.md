@@ -1,6 +1,6 @@
 # Examples
 
-This directory contains example evaluation tasks using Easy Eval.
+This directory contains example evaluation tasks using Easy Inspect.
 
 ## Structure
 
@@ -13,9 +13,10 @@ This directory contains example evaluation tasks using Easy Eval.
 Ensure you have installed additional dependencies:
 
 ```bash
-pip install easy-eval[examples]
+pip install easy-inspect[examples]
 ```
 
 Set up your environment variables in `.env`.
 
 Run `run.py` (as ipykernel) to evaluate the questions and view the results.
+

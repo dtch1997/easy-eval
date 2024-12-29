@@ -20,9 +20,7 @@ Easy Inspect provides a simple way to evaluate language models using YAML config
 ## Installation
 
 ```bash
-git clone https://github.com/dtch1997/easy-eval.git
-cd easy-eval
-pip install -e .
+pip install easy-inspect
 ```
 
 ## Usage
