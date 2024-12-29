@@ -1,6 +1,3 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 from pathlib import Path
 from easy_eval import Runner
 from easy_eval.loading import load_question_from_yaml_dir
@@ -35,7 +32,7 @@ if __name__ == "__main__":
 
     # Example 2: Free-form question, judged on 0-100 scale
     question = load_question_from_yaml_dir("example_2", curr_dir)
-    # runner.with_question(question).with_models(models).run()
+    runner.with_question(question).with_models(models).run()
     df = runner.load_results()
     print(df)
 

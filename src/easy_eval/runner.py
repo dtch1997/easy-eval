@@ -70,7 +70,10 @@ class Runner:
         logs = []
         for log_path in self.log_dir.glob("*.eval"):
             log = read_eval_log(str(log_path))
-            if log.status == "success":
+            if log.status != "success":
+                continue
+            # Hacky way to check if the log is for the current question
+            if log.eval.task.split("/")[-1] == self.question.config.id:
                 logs.append(log)
         return logs
 

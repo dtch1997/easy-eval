@@ -1,6 +1,6 @@
 from inspect_ai.scorer import Scorer, Score, scorer
 
-@scorer
+@scorer(metrics=[])
 def dummy() -> Scorer:
     async def score_fn(state, target):
         del state, target
