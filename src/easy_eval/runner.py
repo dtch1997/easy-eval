@@ -3,7 +3,7 @@ from pathlib import Path
 
 from inspect_ai import eval
 from inspect_ai.log import EvalLog, write_eval_log, read_eval_log
-from lm_query.benchmark import Benchmark
+from easy_eval.benchmark import Benchmark
 
 def get_filename(question_hash: str, model_hash: str) -> Path:
     return hashlib.sha256(f"{question_hash}_{model_hash}".encode()).hexdigest()

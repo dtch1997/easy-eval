@@ -9,7 +9,7 @@ from inspect_ai.solver import Solver, generate, system_message
 from inspect_ai.scorer import Scorer
 from inspect_ai import Task, task
 
-from lm_query.scorer import dummy, model_graded_rating
+from easy_eval.scorer import dummy, model_graded_rating
 
 QuestionMetadata = dict[str, str]
 QuestionType = Literal[

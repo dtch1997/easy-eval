@@ -3,7 +3,7 @@ import seaborn as sns
 import pandas as pd
 
 from pathlib import Path
-from lm_query import Benchmark, Runner
+from easy_eval import Benchmark, Runner
 from dotenv import load_dotenv
 from inspect_ai.log import EvalLog
 
