@@ -104,7 +104,7 @@ class Question:
             for judge_metric, judge_prompt in self.judge_prompts.items():
                 scorers.append(model_graded_rating(
                     model=self.judge_models,
-                    instructions=judge_prompt
+                    criterion=judge_prompt
                 ))
             return scorers
         elif self.type == "answer_0_100":

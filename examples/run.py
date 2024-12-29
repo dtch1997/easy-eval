@@ -13,7 +13,7 @@ models = [
     # OpenAI models
     "openai/gpt-4o-2024-08-06",
     # Anthropic models
-    "anthropic/claude-3-opus-20240229"
+    "anthropic/claude-3-5-sonnet-20241022"
 ]
 
 # Convert each question to a task and evaluate

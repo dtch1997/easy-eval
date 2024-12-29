@@ -28,7 +28,10 @@ Answer: {answer}
 
 Criterion: {criterion}
 
-{instructions}"""
+{instructions}
+
+Rate the answer on a scale from 0 to 100.
+"""
 
 DEFAULT_MODEL_GRADED_RATING_INSTRUCTIONS = """Please evaluate the answer based on the given criterion.
 
@@ -46,9 +49,10 @@ DEFAULT_MODEL_GRADED_RATING_PATTERN = r"JUDGE_RATING:\s*(\d+)"
 
 @scorer(metrics=[mean(), stderr()])
 def model_graded_rating(
+    criterion: str,
     template: str | None = None,
     instructions: str | None = None,
-    grade_pattern: str | None = None,
+    rating_pattern: str | None = None,
     include_history: bool | Callable[[TaskState], str] = False,
     model: list[str | Model] | str | Model | None = None,
 ) -> Scorer:
@@ -61,8 +65,8 @@ def model_graded_rating(
             Defaults to DEFAULT_MODEL_GRADED_RATING_TEMPLATE.
         instructions (str | None): Grading instructions for the model. Should guide
             the model to provide a numerical rating and reasoning that matches the
-            specified `grade_pattern`. Defaults to DEFAULT_MODEL_GRADED_RATING_INSTRUCTIONS.
-        grade_pattern (str | None): Regex to extract the numerical rating from the
+            specified `rating_pattern`. Defaults to DEFAULT_MODEL_GRADED_RATING_INSTRUCTIONS.
+        rating_pattern (str | None): Regex to extract the numerical rating from the
             model response. Should have a single capture group that extracts a number
             between 0-100. Defaults to DEFAULT_MODEL_GRADED_RATING_PATTERN.
         include_history (bool | Callable[[TaskState], str]): Whether to include the
@@ -79,22 +83,24 @@ def model_graded_rating(
     # bind variables
     get_scorer = partial(
         _model_graded_rating_single,
-        template,
-        instructions,
-        grade_pattern,
-        include_history,
+        criterion = criterion,
+        template = template or DEFAULT_MODEL_GRADED_RATING_TEMPLATE,
+        instructions = instructions or DEFAULT_MODEL_GRADED_RATING_INSTRUCTIONS,
+        rating_pattern = rating_pattern or DEFAULT_MODEL_GRADED_RATING_PATTERN,
+        include_history = include_history,
     )
     # if only a single model is passed, return a single scorer
     if model is None or not isinstance(model, list):
-        return get_scorer(model)
+        return get_scorer(model = model)
 
     # otherwise, use multi scorer
     assert isinstance(model, list)
-    scorers = [get_scorer(model) for model in model]
+    scorers = [get_scorer(model = m) for m in model]
     return multi_scorer(scorers, "mean")
 
 @scorer(metrics=[mean(), stderr()])
 def _model_graded_rating_single(
+    criterion: str,
     template: str,
     instructions: str,
     rating_pattern: str,
@@ -123,7 +129,7 @@ def _model_graded_rating_single(
         score_prompt = template.format(
             question=question,
             answer=state.output.completion,
-            criterion=target.text,
+            criterion=criterion,
             instructions=instructions,
             **metadata,
         )
