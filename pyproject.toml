@@ -5,7 +5,7 @@ description = "High-level interface for evaluating and querying LLMs"
 authors = [
     {name = "Daniel Tan", email = "dtch1997@users.noreply.github.com"},
 ]
-dependencies = ["pandas>=2.2.3", "tqdm>=4.67.1", "inspect-ai>=0.3.55"]
+dependencies = ["pandas>=2.2.3", "tqdm>=4.67.1", "inspect-ai>=0.3.55", "seaborn>=0.13.2", "matplotlib>=3.10.0", "plotly>=5.24.1"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
@@ -17,6 +17,10 @@ examples = [
     "ipywidgets>=8.1.5",
     "openai>=1.58.1",
     "anthropic>=0.42.0",
+]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.0",
 ]
 [build-system]
 requires = ["pdm-backend"]

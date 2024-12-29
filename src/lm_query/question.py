@@ -102,9 +102,16 @@ class Question:
         if self.type == "judge_0_100":
             scorers = []
             for judge_metric, judge_prompt in self.judge_prompts.items():
+                # Ugh moment: Can't name the scorer based on runtime variables
+                # This is because we add the scorer to registry before we know the name
+                # TODO: How to fix this? 
+
+                # Potential fix: 
+                # - Define runtime lambda functions as scorers which wrap the model_graded_rating
+                # - Then, name the scorer based on the lambda function
                 scorers.append(model_graded_rating(
                     model=self.judge_models,
-                    criterion=judge_prompt
+                    criterion=judge_prompt,
                 ))
             return scorers
         elif self.type == "answer_0_100":

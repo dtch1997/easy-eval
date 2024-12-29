@@ -77,6 +77,7 @@ def model_graded_rating(
     Returns:
         Scorer: A scoring function that returns normalized scores between 0 and 1.
     """
+
     # bind variables
     get_scorer = partial(
         _model_graded_rating_single,
@@ -95,7 +96,6 @@ def model_graded_rating(
     scorers = [get_scorer(model = m) for m in model]
     return multi_scorer(scorers, "mean")
 
-@scorer(metrics=[mean(), stderr()])
 def _model_graded_rating_single(
     criterion: str,
     template: str,
